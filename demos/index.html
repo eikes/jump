@@ -25,16 +25,6 @@
     position: relative;
   }
 </style>
-<script type="text/javascript">
-  $(function(){
-    $(".map").each(function(i){
-      var $this = $(this);
-      var script = $(this).next().text().trim();
-      $this.wrap($('<div>').addClass("outer"));
-      $this.after($('<pre>').css("display", "inline").text(script));
-    });
-  });
-</script>
 </head>
 <body>
 
@@ -74,5 +64,14 @@
   );
 </script>
 
+<script>
+  // This is not related to the maps! It only shows the used JavaScript on the page.
+  $(".map").each(function(i){
+    var $this = $(this);
+    var script = $(this).next().text().trim();
+    $this.wrap($('<div>').addClass("outer"));
+    $this.after($('<pre>').css("display", "inline").text(script));
+  });
+</script>
 </body>
 </html>
