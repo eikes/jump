@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map with jQuery</title>
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="../jump.js"></script>
+<style>
+  body {
+    margin: 10px 0 0 10px;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  .outer {
+    border: 1px solid gray;
+    width: 600px;
+    margin-bottom: 10px;
+  }
+	.map {
+    width: 600px;
+    height: 400px;
+    overflow: hidden;
+    position: relative;
+  }
+</style>
+<script type="text/javascript">
+  $(function(){
+    $(".map").each(function(i){
+      var $this = $(this);
+      var script = $(this).next().text().trim();
+      $this.wrap($('<div>').addClass("outer"));
+      $this.after($('<pre>').css("display", "inline").text(script));
+    });
+  });
+</script>
+</head>
+<body>
+
+<div id="map0" class="map"></div>
+<script>
+  $("#map0").jump({
+    center: {
+      lon: 10,
+      lat: 50.9
+    },
+    zoom:6
+  });
+</script>
+
+<div id="map1" class="map"></div>
+<script>
+  $("#map1").jump({
+    center: {
+      lon: 13.4077,
+      lat: 52.48935
+    },
+    zoom:14,
+    coordinates: true
+  })
+  .trigger(
+    'addElement', {
+      element: $('<div>')
+        .css("border", "4px solid red")
+        .css("height", "10")
+        .css("width", "10")
+        .borderradius("6px")
+        .click(function(){alert("U-Bhf Südstern")})
+      ,
+      offset: {x:-9, y:-9},
+      location: {lon: 13.4077, lat: 52.48935}
+    }
+  );
+</script>
+
+</body>
+</html>
