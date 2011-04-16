@@ -180,6 +180,7 @@
     },
     clickcontroller: true,
     mousecontroller: true,
+    touchcontroller: true,
     osmtiles: {tilesize: 256},
     attribution: true
   };
@@ -270,6 +271,67 @@
   }
 })(jQuery);
 
+// touch controller:
+(function($){
+  $.jump.plugins.touchcontroller = {
+    start: function(element, options){
+      var state = element.data("state");
+      // Start dragging the map around:
+      function touchstart(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        var touches = e.originalEvent.touches;
+        //alert(touches.length);
+        if (touches.length == 1) {
+          currentlydragging = element;
+          state.dragging = {};
+          state.dragging.start = {
+            x: touches[0].clientX,
+            y: touches[0].clientY
+          }
+          state.dragging.original_x = state.center.x;
+          state.dragging.original_y = state.center.y;
+          $(document).bind("touchmove", touchmove);
+          $(document).bind("touchend", touchend);
+        } else {
+          // it's a gesture
+          touchend(e);
+        }
+      }; 
+      element.bind("touchstart", touchstart);
+      function touchmove(e){
+        state.dragging.dragOffset = {
+          x: e.originalEvent.touches[0].clientX - state.dragging.start.x,
+          y: e.originalEvent.touches[0].clientY - state.dragging.start.y
+        }
+        var newcenter = {
+          x: state.dragging.original_x - state.dragging.dragOffset.x,
+          y: state.dragging.original_y - state.dragging.dragOffset.y
+        }
+        currentlydragging.trigger("changecenter", newcenter);
+      };
+      function touchend(e){
+        var touches = e.originalEvent.touches;
+        $(document).unbind("touchmove", touchmove);
+        $(document).unbind("touchend", touchend);
+      };
+      function gesturechange(e) {
+        var centerpos = {};
+        if (e.originalEvent.scale < 0.5) {
+          element.triggerHandler('zoomout', centerpos);
+        }
+        if (e.originalEvent.scale > 2) {
+          element.triggerHandler('zoomin', centerpos);
+        }
+      }
+      element.bind("gesturechange", gesturechange);
+    }
+  }
+  // These functions work on the document, because
+  // dragging should still work when the mouse is not over the map element
+})(jQuery);
+
 // mouse controller:
 (function($){
   $.jump.plugins.mousecontroller = {
@@ -298,10 +360,10 @@
       }
       element.bind('mousewheel', mousescroll);
       element.bind('DOMMouseScroll', mousescroll);
-      element.onmousewheel = mousescroll;
+      //element.onmousewheel = mousescroll;
       
       // Start dragging the map around:
-      element.mousedown(function(e){
+      element.bind("mousedown", function(e){
         currentlydragging = element;
         if(e.preventDefault) {
           e.preventDefault();
@@ -319,7 +381,7 @@
   // These functions work on the document, because
   // dragging should still work when the mouse is not over the map element
   var currentlydragging = false;
-  $(document).mousemove(function(e){
+  $(document).bind("mousemove", function(e){
     if (currentlydragging) {
       var state = currentlydragging.data("state");
       state.dragging.dragOffset = {
@@ -333,7 +395,7 @@
       currentlydragging.trigger("changecenter", newcenter);
     }
   });
-  $(document).mouseup(function(e){
+  $(document).bind("mouseup", function(e){
     if (currentlydragging) {
       currentlydragging = false;
     }
