@@ -57,7 +57,7 @@
         location.pixelDiff = {
           x: location.old_center.x - location.new_center.x,
           y: location.old_center.y - location.new_center.y
-        }
+        };
         location.getNewLon = function() {
           return $.jump.x2lon(location.x, state.zoom, state.tilesize);
         };
@@ -71,7 +71,7 @@
         var newcenter = {
           x: state.center.x + (distance.x ? distance.x : 0),
           y: state.center.y + (distance.y ? distance.y : 0)
-        }
+        };
         node.triggerHandler('changecenter', newcenter);
       };
       node.bind('move', move);
@@ -80,7 +80,7 @@
         var result = {
           old_level: state.zoom,
           new_level: level
-        }
+        };
         state.zoom = level;
         return result;
       };
@@ -106,7 +106,7 @@
               (state.center.x - Math.floor(node.width()/2)),
           y: $.jump.lat2y(lat, state.zoom, state.tilesize) -
               (state.center.y - Math.floor(node.height()/2)),
-        }
+        };
         return result;
       };
       
@@ -138,7 +138,7 @@
             x: state.center.x + Math.round(node.width()/2),
             y: state.center.y + Math.round(node.height()/2)
           }
-        }
+        };
       };
       node.bind('getBoundingBox', getBoundingBox);
       
@@ -146,7 +146,7 @@
       // that the previous bindings are executed beforehand
       for (var pluginname in $.jump.plugins) {
         plugin = $.jump.plugins[pluginname];
-        pluginoptions = state[pluginname];
+        var pluginoptions = state[pluginname];
         if (state[pluginname]) {
           plugin.start(node, pluginoptions);
         }
