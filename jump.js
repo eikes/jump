@@ -144,7 +144,8 @@
       
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
-      for (var pluginname in $.jump.plugins) {
+      var pluginname;
+      for (pluginname in $.jump.plugins) {
         plugin = $.jump.plugins[pluginname];
         var pluginoptions = state[pluginname];
         if (state[pluginname]) {
@@ -216,7 +217,8 @@
         var bottomCount = Math.ceil((element.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
 
         // show tiles:
-        for (var i in tilelist) {
+        var i;
+        for (i in tilelist) {
             tilelist[i].data("visible", false);
         }
         var img_template = $("<img/>")
@@ -249,7 +251,7 @@
             current.img.data("visible", true);
           }
         }
-        for (var i in tilelist) {
+        for (i in tilelist) {
             if(!tilelist[i].data("visible")) {
                 $('#'+i).remove();
                 delete tilelist[i];
