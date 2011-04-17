@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Map with jQuery</title>
+<title>Map demo using jQuery and jump plugin</title>
 <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
 <script src="../jump.js"></script>
 <style>
@@ -18,11 +18,9 @@
     width: 600px;
     margin-bottom: 10px;
   }
-	.map {
+  .map {
     width: 600px;
     height: 400px;
-    overflow: hidden;
-    position: relative;
   }
 </style>
 </head>
@@ -49,19 +47,14 @@
     zoom:14,
     coordinates: true
   })
-  .trigger(
-    'addElement', {
-      element: $('<div>')
-        .css("border", "4px solid red")
-        .css("height", "10")
-        .css("width", "10")
-        .borderradius("6px")
-        .click(function(){alert("U-Bhf Südstern")})
-      ,
-      offset: {x:-9, y:-9},
-      location: {lon: 13.4077, lat: 52.48935}
-    }
-  );
+  .trigger('addMarker', {
+      content: "U-Bhf Südstern",
+      location: {lon: 13.4077276, lat: 52.4893322}
+  })
+  .trigger('addMarker', {
+      content: "U-Bhf Herrmannplatz",
+      location: {lon: 13.4243789, lat: 52.4864284}
+  })
 </script>
 
 <script>

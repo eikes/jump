@@ -37,10 +37,12 @@
   $.fn.jump = function(options) {
     options = $.extend({}, $.fn.jump.defaults, options);
     return this.each(function(){
-      var node = $(this);
-      // todo: Add ability to provide a bounding box
+      var $this = $(this);
+      $this
+        .css("position", "relative")
+        .css("overflow", "hidden");
       var state = $.extend(true, {}, options);
-      node.data("state", state);
+      $this.data("state", state);
 
       function changecenter(e, location) {
         location.old_center = $.extend({},state.center);
@@ -65,47 +67,48 @@
           return $.jump.y2lat(location.y, state.zoom, state.tilesize);
         };
       }
-      node.bind('changecenter', changecenter);
+      $this.bind('changecenter', changecenter);
 
       function move(e, distance) {
         var newcenter = {
           x: state.center.x + (distance.x ? distance.x : 0),
           y: state.center.y + (distance.y ? distance.y : 0)
         };
-        node.triggerHandler('changecenter', newcenter);
+        $this.triggerHandler('changecenter', newcenter);
       }
-      node.bind('move', move);
+      $this.bind('move', move);
 
       function zoom(e, level) {
+        if (level < 0) level = 0;
+        if (level > 18) level = 18;
         var result = {
           old_level: state.zoom,
-          new_level: level
+          new_level: level,
+          diff: level - state.zoom
         };
+        state.center.x = state.center.x * Math.pow(2, result.diff);
+        state.center.y = state.center.y * Math.pow(2, result.diff);
         state.zoom = level;
         return result;
       }
-      node.bind('zoom', zoom);
+      $this.bind('zoom', zoom);
 
       function zoomin(e) {
-        state.center.x = state.center.x * 2;
-        state.center.y = state.center.y * 2;
-        node.triggerHandler('zoom', state.zoom + 1);
+        return $this.triggerHandler('zoom', state.zoom + 1);
       }
-      node.bind('zoomin', zoomin);
+      $this.bind('zoomin', zoomin);
 
       function zoomout(e) {
-        state.center.x = Math.floor(state.center.x / 2);
-        state.center.y = Math.floor(state.center.y / 2);
-        node.triggerHandler('zoom', state.zoom - 1);
+        return $this.triggerHandler('zoom', state.zoom - 1);
       }
-      node.bind('zoomout', zoomout);
+      $this.bind('zoomout', zoomout);
       
       function getOffset(lon, lat) {
         var result = {
           x: $.jump.lon2x(lon, state.zoom, state.tilesize) -
-              (state.center.x - Math.floor(node.width()/2)),
+              (state.center.x - Math.floor($this.width()/2)),
           y: $.jump.lat2y(lat, state.zoom, state.tilesize) -
-              (state.center.y - Math.floor(node.height()/2))
+              (state.center.y - Math.floor($this.height()/2))
         };
         return result;
       }
@@ -118,29 +121,72 @@
         el.css("position", "absolute");
         el.css("left", position.x + off.x);
         el.css("top", position.y + off.y);
-        el.css("z-index", 10);
-        node.append(el);
-        node.bind("zoom changecenter", function(event, level) {
+        $this.append(el);
+        $this.bind("zoom changecenter", function(event, level) {
           position = getOffset(loc.lon, loc.lat);
           el.css("left", position.x + off.x);
           el.css("top", position.y + off.y);
         });
       }
-      node.bind('addElement', addElement);
+      $this.bind('addElement', addElement);
+      
+      function addMarker(event, options) {
+        options = $.extend({
+          color: "red",
+          content: false,
+          offset: {x:-9, y: -9}
+        }, options);
+        var popup = $('<div>')
+          .css("border", "1px solid grey")
+          .css("background-color", "white")
+          .css("z-index", 11)
+          .addClass("popupContent")
+          .html(options.content)
+          .mouseover(function() {
+              $(this).show();
+            })
+          .mouseout(function() {
+              $(this).hide();
+            })
+          .hide();
+          
+        var el = $('<div>')
+          .css("border", "4px solid "+options.color)
+          .css("height", "10")
+          .css("width", "10")
+          .css("z-index", 10)
+          .borderradius("10px")
+          .mouseover(function() {
+              popup.show();
+            })
+          .mouseout(function() {
+              popup.hide();
+            });
+        $this.trigger('addElement', {
+          element: popup,
+          location: options.location
+        });
+        $this.trigger('addElement', {
+          element: el,
+          offset: options.offset,
+          location: options.location
+        });
+      }
+      $this.bind('addMarker', addMarker);
       
       function getBoundingBox() {
         var bbox = {
           topleft: {
-            x: state.center.x - Math.round(node.width()/2),
-            y: state.center.y - Math.round(node.height()/2)
+            x: state.center.x - Math.round($this.width()/2),
+            y: state.center.y - Math.round($this.height()/2)
           },
           bottomright: {
-            x: state.center.x + Math.round(node.width()/2),
-            y: state.center.y + Math.round(node.height()/2)
+            x: state.center.x + Math.round($this.width()/2),
+            y: state.center.y + Math.round($this.height()/2)
           }
         };
       }
-      node.bind('getBoundingBox', getBoundingBox);
+      $this.bind('getBoundingBox', getBoundingBox);
       
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
@@ -149,16 +195,16 @@
         plugin = $.jump.plugins[pluginname];
         var pluginoptions = state[pluginname];
         if (state[pluginname]) {
-          plugin.start(node, pluginoptions);
+          plugin.start.call(this, pluginoptions);
         }
       }
       
       // Let others know where the mouse/finger is:
-      node.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
+      $this.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
         function(e) {
           var pos = {
-            x: e.pageX - node.offset().top + state.center.x - node.width()/2,
-            y: e.pageY - node.offset().left + state.center.y - node.height()/2
+            x: e.pageX - $this.offset().top + state.center.x - $this.width()/2,
+            y: e.pageY - $this.offset().left + state.center.y - $this.height()/2
           };
           e.getLat = function() {
             return $.jump.y2lat(pos.y, state.zoom, state.tilesize);
@@ -170,7 +216,7 @@
         });
       
       // Let everyone do their thing:
-      node.triggerHandler('changecenter', state.center);
+      $this.triggerHandler('changecenter', state.center);
     });
   };
   $.fn.jump.defaults = {
@@ -191,9 +237,10 @@
 // OpenStreetMap tiles plugin
 (function($){
   $.jump.plugins.osmtiles = {
-    start: function(element, options){
+    start: function(options){
+      var $this = $(this);
       options = $.extend({}, $.jump.plugins.osmtiles.defaults, options);
-      var state = element.data("state");
+      var state = $this.data("state");
       state.tilesize = options.tilesize;
       var tilelist = {};
       function updatetiles() {
@@ -205,16 +252,16 @@
         centertile.xTileOffset = state.center.x - state.tilesize * centertile.x;
         centertile.yTileOffset = state.center.y - state.tilesize * centertile.y;
 
-        centertile.xTotalOffset = Math.floor(element.width()/2 - centertile.xTileOffset);
-        centertile.yTotalOffset = Math.floor(element.height()/2 - centertile.yTileOffset);
+        centertile.xTotalOffset = Math.floor($this.width()/2 - centertile.xTileOffset);
+        centertile.yTotalOffset = Math.floor($this.height()/2 - centertile.yTileOffset);
 
         // the amount of tiles to the left and to the right of the center tile
-        var leftCount = Math.ceil((element.width()/2 - centertile.xTileOffset) / state.tilesize);
-        var rightCount = Math.ceil((element.width()/2 + centertile.xTileOffset) / state.tilesize) - 1;
+        var leftCount = Math.ceil(($this.width()/2 - centertile.xTileOffset) / state.tilesize);
+        var rightCount = Math.ceil(($this.width()/2 + centertile.xTileOffset) / state.tilesize) - 1;
 
         // the amount of tiles to the top and to the bottom of the center tile
-        var topCount = Math.ceil((element.height()/2 - centertile.yTileOffset) / state.tilesize);
-        var bottomCount = Math.ceil((element.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
+        var topCount = Math.ceil(($this.height()/2 - centertile.yTileOffset) / state.tilesize);
+        var bottomCount = Math.ceil(($this.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
 
         // show tiles:
         var i, x, y;
@@ -240,7 +287,7 @@
                 .css("left", current.left)
                 .css("top", current.top)
                 .attr("src", options.tileurl(state.zoom, current.tileXID, current.tileYID));
-              element.append(current.img);
+              $this.append(current.img);
               tilelist[current.id] = current.img;
               //console.log(current.id);
             } else {
@@ -258,14 +305,15 @@
             }
         }
       }
-      element.bind('updatetiles', updatetiles);
-      element.bind('changecenter', updatetiles);
-      element.bind('zoom', updatetiles);
+      $this.bind('updatetiles', updatetiles);
+      $this.bind('changecenter', updatetiles);
+      $this.bind('zoom', updatetiles);
     }
   }
   $.jump.plugins.osmtiles.defaults = {
     tilesize: 256,
     tileurl: function(zoom,x,y) {
+      zoom = Math.floor(zoom);
       var a = String.fromCharCode(97+Math.abs(zoom+x+y)%3); // a is either "a", "b" or "c"
       return "http://"+a+".tile.openstreetmap.org/"+zoom+"/"+x+"/"+y+".png";
       //return "tiles/"+zoom+"/"+x+"/"+y+".png";
@@ -276,8 +324,9 @@
 // touch controller:
 (function($){
   $.jump.plugins.touchcontroller = {
-    start: function(element, options){
-      var state = element.data("state");
+    start: function(options){
+      var $this = $(this);
+      var state = $this.data("state");
       // Start dragging the map around:
       function touchstart(e) {
         if (e.preventDefault) {
@@ -286,7 +335,7 @@
         var touches = e.originalEvent.touches;
         //alert(touches.length);
         if (touches.length == 1) {
-          currentlydragging = element;
+          currentlydragging = $this;
           state.dragging = {};
           state.dragging.start = {
             x: touches[0].clientX,
@@ -301,7 +350,7 @@
           touchend(e);
         }
       }; 
-      element.bind("touchstart", touchstart);
+      $this.bind("touchstart", touchstart);
       function touchmove(e){
         state.dragging.dragOffset = {
           x: e.originalEvent.touches[0].clientX - state.dragging.start.x,
@@ -320,14 +369,15 @@
       };
       function gesturechange(e) {
         var centerpos = {};
-        if (e.originalEvent.scale < 0.5) {
-          element.triggerHandler('zoomout', centerpos);
+        //$this.triggerHandler('zoom', state.zoom - 1 + e.originalEvent.scale);
+        if (e.originalEvent.scale < 0.75) {
+          $this.triggerHandler('zoomout', centerpos);
         }
-        if (e.originalEvent.scale > 2) {
-          element.triggerHandler('zoomin', centerpos);
+        if (e.originalEvent.scale > 1.25) {
+          $this.triggerHandler('zoomin', centerpos);
         }
       }
-      element.bind("gesturechange", gesturechange);
+      $this.bind("gesturechange", gesturechange);
     }
   }
   // These functions work on the document, because
@@ -337,39 +387,37 @@
 // mouse controller:
 (function($){
   $.jump.plugins.mousecontroller = {
-    start: function(element, options){
-      var state = element.data("state");
+    start: function(options){
+      var $this = $(this);
+      var state = $this.data("state");
       
       // Mousewheel handling:
       function mousescroll(e) {
-        if(e.preventDefault) {
-          e.preventDefault();
-        }
+        e.preventDefault();
         var delta = 0;
         e.type = "mousewheel";
         if ( event.wheelDelta ) delta = event.wheelDelta/120;
         if ( event.detail     ) delta = -event.detail/3;
         var mousepos = {
-          x: e.pageX - element.offset().top,
-          y: e.pageY - element.offset().left,
+          x: e.pageX - $this.offset().top,
+          y: e.pageY - $this.offset().left,
         }
         if (delta > 0) {
-          element.triggerHandler('zoomin', mousepos);
+          $this.triggerHandler('zoomin', mousepos);
         }
         if (delta < 0) {
-          element.triggerHandler('zoomout', mousepos);
+          $this.triggerHandler('zoomout', mousepos);
         }
       }
-      element.bind('mousewheel', mousescroll);
-      element.bind('DOMMouseScroll', mousescroll);
-      //element.onmousewheel = mousescroll;
+      $this.bind('mousewheel', mousescroll);
+      $this.bind('DOMMouseScroll', mousescroll);
+      //$this.onmousewheel = mousescroll;
       
       // Start dragging the map around:
-      element.bind("mousedown", function(e){
-        currentlydragging = element;
-        if(e.preventDefault) {
-          e.preventDefault();
-        }
+      function mousedown(e){
+        e.preventDefault();
+        var $this = e.data.el;
+        var state = $this.data("state");
         state.dragging = {};
         state.dragging.start = {
           x: e.pageX,
@@ -377,57 +425,57 @@
         }
         state.dragging.original_x = state.center.x;
         state.dragging.original_y = state.center.y;
-      });
+        $(document).bind("mousemove", mousemove);
+        $(document).bind("mouseup", mouseup);
+      }
+  // These functions work on the document, because
+  // dragging should still work when the mouse is not over the map $this
+      function mousemove(e){
+        e.preventDefault();
+        state.dragging.dragOffset = {
+            x: e.pageX - state.dragging.start.x,
+            y: e.pageY - state.dragging.start.y
+        }
+        var newcenter = {
+            x: state.dragging.original_x - state.dragging.dragOffset.x,
+            y: state.dragging.original_y - state.dragging.dragOffset.y
+        }
+        $this.trigger("changecenter", newcenter);
+      }
+      function mouseup(e){
+        $(document).unbind("mousemove", mousemove);
+        $(document).unbind("mouseup", mouseup);
+      }
+      $this.bind("mousedown", {el: $this}, mousedown);
     }
   }
-  // These functions work on the document, because
-  // dragging should still work when the mouse is not over the map element
-  var currentlydragging = false;
-  $(document).bind("mousemove", function(e){
-    if (currentlydragging) {
-      var state = currentlydragging.data("state");
-      state.dragging.dragOffset = {
-        x: e.pageX - state.dragging.start.x,
-        y: e.pageY - state.dragging.start.y
-      }
-      var newcenter = {
-        x: state.dragging.original_x - state.dragging.dragOffset.x,
-        y: state.dragging.original_y - state.dragging.dragOffset.y
-      }
-      currentlydragging.trigger("changecenter", newcenter);
-    }
-  });
-  $(document).bind("mouseup", function(e){
-    if (currentlydragging) {
-      currentlydragging = false;
-    }
-  });
 })(jQuery);
 
 // The little navigation boxes in the upper left corner are created here:
 (function($){
   $.jump.plugins.clickcontroller = {
-    start: function(element, options){
-      //console.log("clickcontroller.start called", element, options);
+    start: function(options){
+      var $this = $(this);
+      //console.log("clickcontroller.start called", $this, options);
       var div = $('<div class="clicknavigation">')
-        .css("width", "52px")
+        .css("width", "60px")
         .css("position", "absolute")
         .css("z-index", "10")
         .css("top", "20px")
         .css("left", "20px");
       var a = $('<a class="clicknavigationbox" href="#">')
-        .css("width", "21px")
-        .css("height", "21px")
+        .css("width", "25px")
+        .css("height", "25px")
         .css("margin", "0")
         .css("background-color", "#FAFAFA")
         .css("border", "1px solid #AAA")
         .css("display", "inline-block")
         .css("text-align", "center")
         .css("font-weight", "bold")
-        .css("font-size", "16px")
+        .css("font-size", "18px")
         .css("text-decoration", "none");
       function trig(event, args) {
-        element.trigger(event, args);
+        $this.trigger(event, args);
         return false;
       }
       var north = a.clone()
@@ -435,35 +483,35 @@
         .html("&uarr;")
         .borderradius("15px 15px 0 0")
         .css("margin-left", "12px")
-        .bind("click", function() {element.trigger("move", {y: -10});return false});
+        .bind("touchstart click", function(e) {$this.trigger("move", {y: -10});return false});
       var west = a.clone()
         .addClass("gowest")
         .html("&larr;")
         .borderradius("15px 0 0 15px")
-        .bind("click", function() {element.trigger("move", {x: -10});return false});
+        .bind("touchstart click", function(e) {$this.trigger("move", {x: -10});return false});
       var east = a.clone()
         .addClass("goeast")
         .html("&rarr;")
         .borderradius("0 15px 15px 0")
-        .bind("click", function() {element.trigger("move", {x: 10});return false});
+        .bind("touchstart click", function(e) {$this.trigger("move", {x: 10});return false});
       var south = a.clone()
         .addClass("gosouth")
         .html("&darr;")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("click", function() {element.trigger("move", {y: 10});return false});
+        .bind("touchstart click", function(e) {$this.trigger("move", {y: 10});return false});
       var zoomin = a.clone()
         .addClass("zoomin")
         .html("+")
         .borderradius("15px 15px 0 0")
         .css("margin", "10px 0 0 12px")
-        .bind("click", function() {element.trigger("zoomin");return false});
+        .bind("touchstart click", function(e) {$this.trigger("zoomin");return false});
       var zoomout = a.clone()
         .addClass("zoomout")
         .html("-")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("click", function() {element.trigger("zoomout");return false});
+        .bind("touchstart click", function(e) {$this.trigger("zoomout");return false});
       div
         .append(north)
         .append(west)
@@ -471,7 +519,7 @@
         .append(south)
         .append(zoomin)
         .append(zoomout);
-      element.append(div);
+      $this.append(div);
     }
   }
 })(jQuery);
@@ -491,11 +539,10 @@
 // attribution plugin
 (function($){
   $.jump.plugins['attribution'] = {
-    start: function(element, options){
-      var state = element.data("state");
+    start: function(options){
       var coords = $('<div style="position:absolute;bottom:5px;right:20px;font-family:sans-serif;font-size:12px;z-index:10;">');
       coords.html('Map data CCBYSA <a href="http://openstreetmap.org/">OpenStreetMap.org</a> contributors');
-      element.append(coords);
+      $(this).append(coords);
     }
   }
 })(jQuery);
@@ -503,11 +550,12 @@
 // coordinates plugin
 (function($){
   $.jump.plugins['coordinates'] = {
-    start: function(element, options){
-      var state = element.data("state");
+    start: function(options){
+      var $this = $(this);
+      var state = $this.data("state");
       var coords = $('<div style="position:absolute;bottom:20px;right:20px;font-weight:bold;z-index:10;">');
-      element.append(coords);
-      element.bind("changecenter", function(e, loc) {
+      $this.append(coords);
+      $this.bind("changecenter", function(e, loc) {
       coords.html(
         Math.round(loc.getNewLon()*100000)/100000 + "<br>" +
         Math.round(loc.getNewLat()*100000)/100000);
