@@ -13,24 +13,24 @@
     var x = (lon+180)/360; 
     // Scale it to the appropriate zoom level and tilesize:
     return Math.floor(x * tilesize * Math.pow(2, zoom));
-  }
+  };
   $.jump.lat2y = function(lat, zoom, tilesize) {
     var lat_radians = lat * Math.PI / 180;
     // This is a value between 0 and 1
     var y = (1 - Math.log(Math.tan(lat_radians) + 1 / Math.cos(lat_radians)) / Math.PI) / 2;
     // Scale it to the appropriate zoom level and tilesize:
     return Math.floor(y * tilesize * Math.pow(2, zoom));
-  }
+  };
   
   // Inverse functions, which can be used to get latitude and longitude from a
   // mercator projected pixel coordinate.
   $.jump.x2lon = function(x, zoom, tilesize) {
     return 360 * (((x / tilesize) /  Math.pow(2, zoom)) - 0.5);
-  }
+  };
   $.jump.y2lat = function(y, zoom, tilesize) {
     y = 0.5 - ((y / tilesize) / Math.pow(2, zoom));
     return 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
-  }
+  };
   
   // todo: Add Objects for GeoPoint, BoundingBox, GeoHtmlElement
   
@@ -60,11 +60,11 @@
         }
         location.getNewLon = function() {
           return $.jump.x2lon(location.x, state.zoom, state.tilesize);
-        }
+        };
         location.getNewLat = function() {
           return $.jump.y2lat(location.y, state.zoom, state.tilesize);
-        }
-      }
+        };
+      };
       node.bind('changecenter', changecenter);
 
       function move(e, distance) {
@@ -73,7 +73,7 @@
           y: state.center.y + (distance.y ? distance.y : 0)
         }
         node.triggerHandler('changecenter', newcenter);
-      }
+      };
       node.bind('move', move);
 
       function zoom(e, level) {
@@ -83,21 +83,21 @@
         }
         state.zoom = level;
         return result;
-      }
+      };
       node.bind('zoom', zoom);
 
       function zoomin(e) {
         state.center.x = state.center.x * 2;
         state.center.y = state.center.y * 2;
         node.triggerHandler('zoom', state.zoom + 1);
-      }
+      };
       node.bind('zoomin', zoomin);
 
       function zoomout(e) {
         state.center.x = Math.floor(state.center.x / 2);
         state.center.y = Math.floor(state.center.y / 2);
         node.triggerHandler('zoom', state.zoom - 1);
-      }
+      };
       node.bind('zoomout', zoomout);
       
       function getOffset(lon, lat) {
@@ -108,7 +108,7 @@
               (state.center.y - Math.floor(node.height()/2)),
         }
         return result;
-      }
+      };
       
       function addElement(event, args) {
         var el = args.element;
@@ -125,7 +125,7 @@
           el.css("left", position.x + off.x);
           el.css("top", position.y + off.y);
         });
-      }
+      };
       node.bind('addElement', addElement);
       
       function getBoundingBox() {
@@ -139,7 +139,7 @@
             y: state.center.y + Math.round(node.height()/2)
           }
         }
-      }
+      };
       node.bind('getBoundingBox', getBoundingBox);
       
       // Load and enable pugins, this needs to be done in the end to ensure
