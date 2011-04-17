@@ -144,7 +144,7 @@
       
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
-      for (pluginname in $.jump.plugins) {
+      for (var pluginname in $.jump.plugins) {
         plugin = $.jump.plugins[pluginname];
         var pluginoptions = state[pluginname];
         if (state[pluginname]) {
@@ -157,7 +157,7 @@
         function(e) {
           var pos = {
             x: e.pageX - node.offset().top + state.center.x - node.width()/2,
-            y: e.pageY - node.offset().left + state.center.y - node.height()/2,
+            y: e.pageY - node.offset().left + state.center.y - node.height()/2
           };
           e.getLat = function() {
             return $.jump.y2lat(pos.y, state.zoom, state.tilesize);
@@ -216,7 +216,7 @@
         var bottomCount = Math.ceil((element.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
 
         // show tiles:
-        for (i in tilelist) {
+        for (var i in tilelist) {
             tilelist[i].data("visible", false);
         }
         var img_template = $("<img/>")
@@ -249,7 +249,7 @@
             current.img.data("visible", true);
           }
         }
-        for (i in tilelist) {
+        for (var i in tilelist) {
             if(!tilelist[i].data("visible")) {
                 $('#'+i).remove();
                 delete tilelist[i];
