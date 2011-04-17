@@ -217,7 +217,7 @@
         var bottomCount = Math.ceil((element.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
 
         // show tiles:
-        var i;
+        var i, x, y;
         for (i in tilelist) {
             tilelist[i].data("visible", false);
         }
@@ -226,8 +226,8 @@
           .css("width", state.tilesize)
           .css("height", state.tilesize);
 
-        for (var x = -1 * leftCount; x <= rightCount; x++) {
-          for (var y = -1 * topCount; y <= bottomCount; y++) {
+        for (x = -1 * leftCount; x <= rightCount; x++) {
+          for (y = -1 * topCount; y <= bottomCount; y++) {
             var current = {};
             current.tileXID = x + centertile.x;
             current.tileYID = y + centertile.y;
