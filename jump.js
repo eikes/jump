@@ -53,7 +53,7 @@
           state.center.x = location.x;
           state.center.y = location.y;
         }
-        location.new_center = $.extend({}, state.center)
+        location.new_center = $.extend({}, state.center);
         location.pixelDiff = {
           x: location.old_center.x - location.new_center.x,
           y: location.old_center.y - location.new_center.y
@@ -105,7 +105,7 @@
           x: $.jump.lon2x(lon, state.zoom, state.tilesize) -
               (state.center.x - Math.floor(node.width()/2)),
           y: $.jump.lat2y(lat, state.zoom, state.tilesize) -
-              (state.center.y - Math.floor(node.height()/2)),
+              (state.center.y - Math.floor(node.height()/2))
         };
         return result;
       }
@@ -158,20 +158,20 @@
           var pos = {
             x: e.pageX - node.offset().top + state.center.x - node.width()/2,
             y: e.pageY - node.offset().left + state.center.y - node.height()/2,
-          }
+          };
           e.getLat = function() {
             return $.jump.y2lat(pos.y, state.zoom, state.tilesize);
-          }
+          };
           e.getLon = function() {
             return $.jump.x2lon(pos.x, state.zoom, state.tilesize);
-          }
+          };
           return e;
         });
       
       // Let everyone do their thing:
       node.triggerHandler('changecenter', state.center);
     });
-  }
+  };
   $.fn.jump.defaults = {
     zoom: 14,
     center: {
@@ -199,7 +199,7 @@
         var centertile = {
           y: Math.floor(state.center.x/state.tilesize),
           x: Math.floor(state.center.y/state.tilesize)
-        }
+        };
 
         centertile.xTileOffset = state.center.x - state.tilesize * centertile.x;
         centertile.yTileOffset = state.center.y - state.tilesize * centertile.y;
@@ -216,7 +216,7 @@
         var bottomCount = Math.ceil((element.height()/2 + centertile.yTileOffset) / state.tilesize) - 1;
 
         // show tiles:
-        for (var i in tilelist) {
+        for (i in tilelist) {
             tilelist[i].data("visible", false);
         }
         var img_template = $("<img/>")
