@@ -64,7 +64,7 @@
         location.getNewLat = function() {
           return $.jump.y2lat(location.y, state.zoom, state.tilesize);
         };
-      };
+      }
       node.bind('changecenter', changecenter);
 
       function move(e, distance) {
@@ -73,7 +73,7 @@
           y: state.center.y + (distance.y ? distance.y : 0)
         };
         node.triggerHandler('changecenter', newcenter);
-      };
+      }
       node.bind('move', move);
 
       function zoom(e, level) {
@@ -83,21 +83,21 @@
         };
         state.zoom = level;
         return result;
-      };
+      }
       node.bind('zoom', zoom);
 
       function zoomin(e) {
         state.center.x = state.center.x * 2;
         state.center.y = state.center.y * 2;
         node.triggerHandler('zoom', state.zoom + 1);
-      };
+      }
       node.bind('zoomin', zoomin);
 
       function zoomout(e) {
         state.center.x = Math.floor(state.center.x / 2);
         state.center.y = Math.floor(state.center.y / 2);
         node.triggerHandler('zoom', state.zoom - 1);
-      };
+      }
       node.bind('zoomout', zoomout);
       
       function getOffset(lon, lat) {
@@ -108,7 +108,7 @@
               (state.center.y - Math.floor(node.height()/2)),
         };
         return result;
-      };
+      }
       
       function addElement(event, args) {
         var el = args.element;
@@ -125,7 +125,7 @@
           el.css("left", position.x + off.x);
           el.css("top", position.y + off.y);
         });
-      };
+      }
       node.bind('addElement', addElement);
       
       function getBoundingBox() {
@@ -139,12 +139,12 @@
             y: state.center.y + Math.round(node.height()/2)
           }
         };
-      };
+      }
       node.bind('getBoundingBox', getBoundingBox);
       
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
-      for (var pluginname in $.jump.plugins) {
+      for (pluginname in $.jump.plugins) {
         plugin = $.jump.plugins[pluginname];
         var pluginoptions = state[pluginname];
         if (state[pluginname]) {
