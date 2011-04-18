@@ -79,24 +79,11 @@ http://jquery.org/license</p>
       get the source code on GitHub : <a href="http://github.com/eikes/jump">eikes/jump</a>
     </div>
   </div>
-
-  <script>
-    // Show what code is used to create the map
-    $(function() {
-      $('#code').text($('#sample').clone().find('#map').remove().end().append('<div id=map style="width:700px;height:400px;">').html().trim());
-      prettyPrint();
-    });
+<script>
+  // Show what code is used to create the map
+  $(function() {
+    $('#code').text($('#sample').clone().find('#map').remove().end().append('<div id=map style="width:700px;height:400px;">').html().trim());
+    prettyPrint();
+  });
 </script>
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-8283689-4']);
-    _gaq.push(['_trackPageview']);
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script> 
-</body>
 </html>
