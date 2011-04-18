@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>jump jQuery map plugin</title>
+  <script src="demos/prettify/prettify.js"></script>
+  <link href="demos/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <link href="demos/style.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+  <a href="http://github.com/eikes/jump"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  <div id="container">
+    <div class="download">
+      <a href="http://github.com/eikes/jump/zipball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
+      <a href="http://github.com/eikes/jump/tarball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    </div>
+    <h1><a href="http://github.com/eikes/jump">jump</a>
+      <span class="small">by <a href="http://eike.se/nd">eikes</a></span></h1>
+    <div class="description">
+      jump is a standalone jQuery map plugin
+    </div>
+
+<h2>Description</h2>
+<p>
+jump is a light weight maps library that works on its own, meaning, it is not a wrapper for 
+OpenLayers or GoogleMaps API. Currently it is under development, but a lot of essential 
+features work well. 
+</p>
+<h2>Usage</h2>
+<pre class="prettyprint" id="code">
+</pre>
+<p>Which creates this:</p>
+<div id="sample">
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="jump.js"></script>
+<script>
+  $(function() {
+    $("#map").jump({
+      center: {
+        lon: 13.4094825,
+        lat: 52.5207743
+      },
+      zoom:16
+    });
+  });
+</script>
+<div id="map" style="width:700px;height:400px"></div> 
+</div>
+<h2>Demos</h2>
+<p>
+More demos can be found here:
+</p>
+<ul>
+    <li><a href="demos/mobile.html">Optimized for mobile devices</a></li>
+    <li><a href="demos/marker.html">Adding and using markers</a></li>
+</ul>
+<h2>License</h2>
+<p>Copyright (c) 2011 <a href="http://eike.se/nd">Eike Send, http://eike.se/nd</a><br>
+Dual licensed under the MIT or GPL Version 2 licenses, just like jQuery itself:<br>
+http://jquery.org/license</p>
+<h2>Authors</h2>
+<p>Eike Send (eike.send@gmail.com)<br/><br/>      </p>
+
+    <h2>Download</h2>
+    <p>
+      You can download this project in either
+      <a href="http://github.com/eikes/jump/zipball/master">zip</a> or
+      <a href="http://github.com/eikes/jump/tarball/master">tar</a> formats.
+    </p>
+    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+      by running:
+      <pre>$ git clone git://github.com/eikes/jump</pre>
+    </p>
+
+    <div class="footer">
+      get the source code on GitHub : <a href="http://github.com/eikes/jump">eikes/jump</a>
+    </div>
+  </div>
+
+  <script>
+    // Show what code is used to create the map
+    $(function() {
+      $('#code').text($('#sample').clone().find('#map').remove().end().append('<div id=map style="width:700px;height:400px;">').html().trim());
+      prettyPrint();
+    });
+</script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8283689-4']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script> 
+</body>
+</html>
