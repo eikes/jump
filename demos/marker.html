@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map demo using jQuery and jump plugin</title>
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="../jump.js"></script>
+<style>
+  body {
+    margin: 10px 0 0 10px;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  .outer {
+    border: 1px solid gray;
+    width: 600px;
+    margin-bottom: 10px;
+  }
+  .map {
+    width: 600px;
+    height: 400px;
+  }
+</style>
+</head>
+<body>
+
+<div id="map0" class="map"></div>
+<script>
+  $("#map0").jump({
+    center: {
+      lon: 10,
+      lat: 50.9
+    },
+    zoom:6
+  });
+</script>
+
+<div id="map1" class="map"></div>
+<script>
+  $("#map1").jump({
+    center: {
+      lon: 13.4077,
+      lat: 52.48935
+    },
+    zoom:14,
+    coordinates: true
+  })
+  .trigger('addMarker', {
+      content: "U-Bhf Südstern",
+      location: {lon: 13.4077276, lat: 52.4893322}
+  })
+  .trigger('addMarker', {
+      content: "U-Bhf Herrmannplatz",
+      location: {lon: 13.4243789, lat: 52.4864284}
+  })
+</script>
+
+<script>
+  // This is not related to the maps! It only shows the used JavaScript on the page.
+  $(".map").each(function(i){
+    var $this = $(this);
+    var script = $(this).next().text().trim();
+    $this.wrap($('<div>').addClass("outer"));
+    $this.after($('<pre>').css("display", "inline").text(script));
+  });
+</script>
+</body>
+</html>

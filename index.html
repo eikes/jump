@@ -2,92 +2,63 @@
 <html>
 <head>
   <meta charset='utf-8'>
-
-  <title>eikes/jump @ GitHub</title>
-  <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
-  <script src="jump.js"></script>
-  <script>
-    $(function() {
-      $("#map").jump({
-        center: {
-          lon: 10,
-          lat: 50.9
-        },
-        zoom:6
-      });
-    });
-  </script>
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #c8e3f3;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #371c0c; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #371c0c; }
-    h3 { text-align: center; color: #371c0c; }
-    a { color: #371c0c; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+  <title>jump jQuery map plugin</title>
+  <script src="demos/prettify/prettify.js"></script>
+  <link href="demos/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <link href="demos/style.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
   <a href="http://github.com/eikes/jump"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
   <div id="container">
-
     <div class="download">
       <a href="http://github.com/eikes/jump/zipball/master">
         <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
       <a href="http://github.com/eikes/jump/tarball/master">
         <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
     </div>
-
     <h1><a href="http://github.com/eikes/jump">jump</a>
-      <span class="small">by <a href="http://github.com/eikes">eikes</a></span></h1>
-
+      <span class="small">by <a href="http://eike.se/nd">eikes</a></span></h1>
     <div class="description">
-      jump is a jQuery-only map plugin, i.e. it works without OpenLayers
+      jump is a standalone jQuery map plugin
     </div>
 
-<h2>Install</h2>
-<pre>
-&lt;html>
-&lt;head>
-  &lt;script src="http://code.jquery.com/jquery-1.5.2.min.js">&lt;/script>
-  &lt;script src="jump.js">&lt;/script>
-  &lt;script>
-    $(function() {
-      $("#map").jump({
-        center: {
-          lon: 10,
-          lat: 50.9
-        },
-        zoom:6
-      });
-    });
-  &lt;/script>
-&lt;/head>
-&lt;body> 
-  &lt;div id="map" style="width:700px;height:400px">&lt;/div> 
-&lt;/body>
-&lt;/html>
+<h2>Description</h2>
+<p>
+jump is a light weight maps library that works on its own, meaning, it is not a wrapper for 
+OpenLayers or GoogleMaps API. Currently it is under development, but a lot of essential 
+features work well. 
+</p>
+<h2>Usage</h2>
+<pre class="prettyprint" id="code">
 </pre>
-<p>Which does this:</p>
+<p>Which creates this:</p>
+<div id="sample">
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="jump.js"></script>
+<script>
+  $(function() {
+    $("#map").jump({
+      center: {
+        lon: 13.4094825,
+        lat: 52.5207743
+      },
+      zoom:16
+    });
+  });
+</script>
 <div id="map" style="width:700px;height:400px"></div> 
+</div>
+<h2>Demos</h2>
+<p>
+More demos can be found here:
+</p>
+<ul>
+    <li><a href="demos/mobile.html">Optimized for mobile devices</a></li>
+    <li><a href="demos/marker.html">Adding and using markers</a></li>
+</ul>
 <h2>License</h2>
-<p>Copyright (c) 2011 Eike Send, http://eike.se/nd<br>
+<p>Copyright (c) 2011 <a href="http://eike.se/nd">Eike Send, http://eike.se/nd</a><br>
 Dual licensed under the MIT or GPL Version 2 licenses, just like jQuery itself:<br>
 http://jquery.org/license</p>
 <h2>Authors</h2>
@@ -108,6 +79,14 @@ http://jquery.org/license</p>
       get the source code on GitHub : <a href="http://github.com/eikes/jump">eikes/jump</a>
     </div>
   </div>
+
+  <script>
+    // Show what code is used to create the map
+    $(function() {
+      $('#code').text($('#sample').clone().find('#map').remove().end().append('<div id=map style="width:700px;height:400px;">').html().trim());
+      prettyPrint();
+    });
+</script>
 
   <script type="text/javascript">
     var _gaq = _gaq || [];

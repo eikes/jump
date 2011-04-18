@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,height=device-height,width=device-width,user-scalable=false" />
+    <title>mobile jump map with jquery</title>
+    <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+    <script src="../jump.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script>
+        $(function(){
+            $('#map')
+                .css("height", $(window).height()-64)
+                .css("width", $(window).width())
+                .jump({
+                    center: {
+                        lon: 10,
+                        lat: 50.9
+                    },
+                    zoom: 6
+                });
+        });
+        // This hides the url bar:
+        (function(){
+            addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+            function hideURLbar() { window.scrollTo(0, 1); }
+        })();
+    </script>
+</head>
+<body>
+<div id="map">
+</div>
+</body>
+</html>
