@@ -1,3 +1,11 @@
+/*!
+ * jump jQuery map plugin
+ *
+ * Copyright (c) 2011 Eike Send, http://eike.se/nd
+ * Dual licensed under the MIT or GPL Version 2 licenses, just like jQuery itself:
+ * http://jquery.org/license
+ */
+
 ;(function($){
 
   // This is used to expose static functions
