@@ -4,7 +4,19 @@
   <meta charset='utf-8'>
 
   <title>eikes/jump @ GitHub</title>
-
+  <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+  <script src="jump.js"></script>
+  <script>
+    $(function() {
+      $("#map").jump({
+        center: {
+          lon: 10,
+          lat: 50.9
+        },
+        zoom:6
+      });
+    });
+  </script>
   <style type="text/css">
     body {
       margin-top: 1.0em;
@@ -46,13 +58,10 @@
       <span class="small">by <a href="http://github.com/eikes">eikes</a></span></h1>
 
     <div class="description">
-      jump is a jQuery only map plugin
+      jump is a jQuery-only map plugin, i.e. it works without OpenLayers
     </div>
 
-    <h2>Dependencies</h2>
-<p>jQuery</p>
 <h2>Install</h2>
-<p>
 <pre>
 &lt;html>
 &lt;head>
@@ -71,11 +80,12 @@
   &lt;/script>
 &lt;/head>
 &lt;body> 
-  &lt;div id="map" style="width:600px;height:400px">&lt;/div> 
+  &lt;div id="map" style="width:700px;height:400px">&lt;/div> 
 &lt;/body>
 &lt;/html>
 </pre>
-</p>
+<p>Which does this:</p>
+<div id="map" style="width:700px;height:400px"></div> 
 <h2>License</h2>
 <p>Copyright (c) 2011 Eike Send, http://eike.se/nd<br>
 Dual licensed under the MIT or GPL Version 2 licenses, just like jQuery itself:<br>
