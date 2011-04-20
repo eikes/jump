@@ -341,7 +341,6 @@
           e.preventDefault();
         }
         var touches = e.originalEvent.touches;
-        //alert(touches.length);
         if (touches.length == 1) {
           currentlydragging = $this;
           state.dragging = {};
@@ -363,14 +362,13 @@
               inDblTap = false;
             }, 500);
           } else {
-            $this.trigger('dblTap dblClick', e);
+            $this.trigger('dblClick', e);
+            $this.trigger('dblTap', e);
             clearTimeout(dblTapTimer);
             inDblTap = false;
            }
-          
-          
         } else {
-          // it's a gesture
+          // it's a 2 finger gesture
           touchend(e);
         }
       }; 
