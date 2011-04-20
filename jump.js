@@ -353,6 +353,22 @@
           state.dragging.original_y = state.center.y;
           $(document).bind("touchmove", touchmove);
           $(document).bind("touchend", touchend);
+          
+          // set up double tap detection:
+          // thx to touchable.js by dotmaster
+          var inDblTap = dblTapTimer = false;
+          if (!inDblTap) {
+            inDblTap = true;
+            dblTapTimer = setTimeout(function() {
+              inDblTap = false;
+            }, 500);
+          } else {
+            $this.trigger('dblTap dblClick', e);
+            clearTimeout(dblTapTimer);
+            inDblTap = false;
+           }
+          
+          
         } else {
           // it's a gesture
           touchend(e);
