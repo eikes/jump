@@ -335,6 +335,7 @@
     start: function(options){
       var $this = $(this);
       var state = $this.data("state");
+      var inDblTap = dblTapTimer = false;
       // Start dragging the map around:
       function touchstart(e) {
         if (e.preventDefault) {
@@ -355,7 +356,6 @@
           
           // set up double tap detection:
           // thx to touchable.js by dotmaster
-          var inDblTap = dblTapTimer = false;
           if (!inDblTap) {
             inDblTap = true;
             dblTapTimer = setTimeout(function() {
