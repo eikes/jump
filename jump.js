@@ -195,7 +195,23 @@
         };
       }
       $this.bind('getBoundingBox', getBoundingBox);
-      
+
+      // Let others know where the mouse/finger is:
+      $this.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
+        function(e) {
+          e.mapPosition = {
+            x: e.pageX - $this.offset().left + state.center.x - $this.width()/2,
+            y: e.pageY - $this.offset().top + state.center.y - $this.height()/2
+          };
+          e.mapPosition.getLat = function() {
+            return $.jump.y2lat(e.mapPosition.y, state.zoom, state.tilesize);
+          };
+          e.mapPosition.getLon = function() {
+            return $.jump.x2lon(e.mapPosition.x, state.zoom, state.tilesize);
+          };
+          return e;
+        });
+        
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
       var pluginname;
@@ -206,22 +222,6 @@
           plugin.start.call(this, pluginoptions);
         }
       }
-      
-      // Let others know where the mouse/finger is:
-      $this.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
-        function(e) {
-          var pos = {
-            x: e.pageX - $this.offset().top + state.center.x - $this.width()/2,
-            y: e.pageY - $this.offset().left + state.center.y - $this.height()/2
-          };
-          e.getLat = function() {
-            return $.jump.y2lat(pos.y, state.zoom, state.tilesize);
-          };
-          e.getLon = function() {
-            return $.jump.x2lon(pos.x, state.zoom, state.tilesize);
-          };
-          return e;
-        });
       
       // Let everyone do their thing:
       $this.triggerHandler('changecenter', state.center);
@@ -419,13 +419,11 @@
       }
       $this.bind('mousewheel', mousescroll);
       $this.bind('DOMMouseScroll', mousescroll);
-      //$this.onmousewheel = mousescroll;
+      $this.onmousewheel = mousescroll;
       
       // Start dragging the map around:
       function mousedown(e){
         e.preventDefault();
-        var $this = e.data.el;
-        var state = $this.data("state");
         state.dragging = {};
         state.dragging.start = {
           x: e.pageX,
@@ -454,7 +452,13 @@
         $(document).unbind("mousemove", mousemove);
         $(document).unbind("mouseup", mouseup);
       }
-      $this.bind("mousedown", {el: $this}, mousedown);
+      $this.bind("mousedown", mousedown);
+      function dblclick(e){
+        state.center.x = e.mapPosition.x;
+        state.center.y = e.mapPosition.y;
+        $this.triggerHandler("zoomin");
+      }
+      $this.bind("dblclick", dblclick);
     }
   }
 })(jQuery);
