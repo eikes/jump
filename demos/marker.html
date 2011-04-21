@@ -5,6 +5,8 @@
 <title>Map demo using jQuery and jump plugin</title>
 <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
 <script src="../jump.js"></script>
+<script src="prettify/prettify.js"></script> 
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" /> 
 <style>
   body {
     margin: 10px 0 0 10px;
@@ -63,8 +65,9 @@
     var $this = $(this);
     var script = $(this).next().text().trim();
     $this.wrap($('<div>').addClass("outer"));
-    $this.after($('<pre>').css("display", "inline").text(script));
+    $this.after($('<pre>').addClass("prettyprint").text(script));
   });
+  prettyPrint();
 </script>
 </body>
 </html>
