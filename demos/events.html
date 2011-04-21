@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map demo using jQuery and jump plugin</title>
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="../jump.js"></script>
+<script src="prettify/prettify.js"></script> 
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" /> 
+<style>
+  body {
+    margin: 10px 0 0 10px;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  .outer {
+    border: 1px solid gray;
+    width: 600px;
+    margin-bottom: 10px;
+  }
+  .map {
+    width: 600px;
+    height: 400px;
+  }
+</style>
+</head>
+<body>
+
+<input type="button" id="newyork" value="New York">
+<input type="button" id="berlin" value="Berlin">
+<input type="button" id="rio" value="Rio">
+<br>
+Latitude: <input type="text" id="lat">
+Longitude: <input type="text" id="lon">
+Zoom: <input type="text" id="zoom">
+<div id="map0" class="map"></div>
+<script>
+  var map = $("#map0");
+  // initialize:
+  map.jump({
+    center: {
+      lon: 10,
+      lat: 50.9
+    },
+    zoom:6
+  });
+  // Monitor changes to the map
+  map.bind("changecenter", function(e, loc) {
+    $('#lat').val(loc.getNewLat);
+    $('#lon').val(loc.getNewLon);
+  });
+  map.bind("zoom", function(e, z) {
+      console.log(z);
+    $('#zoom').val(z);
+  });
+  // Change the center externally:
+  $("#newyork").click(function() {
+    map.trigger(
+      "changecenter", 
+      { lon: -74.005833, lat: 40.712778}
+    );
+  });
+  $("#berlin").click(function() {
+    map.trigger(
+      "changecenter", 
+      { lat: 52.518611, lon: 13.408056}
+    );
+  });
+  $("#rio").click(function() {
+    map.trigger(
+      "changecenter", 
+      { lat: -22.908333, lon: -43.196389}
+    ).trigger("zoom", 11);
+  });
+</script>
+
+<script>
+  // This is not related to the maps! It only shows the used JavaScript on the page.
+  $(".map").each(function(i){
+    var $this = $(this);
+    var script = $(this).nextAll("script").first().text().trim();
+    $this.wrap($('<div>').addClass("outer"));
+    $this.after($('<pre>').addClass("prettyprint").text(script));
+  });
+  prettyPrint();
+</script>
+</body>
+</html>
