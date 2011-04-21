@@ -199,9 +199,11 @@
       // Let others know where the mouse/finger is:
       $this.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
         function(e) {
+          var px = e.pageX ? e.pageX : e.originalEvent.touches[0].clientX;
+          var py = e.pageY ? e.pageY : e.originalEvent.touches[0].clientY;
           e.mapPosition = {
-            x: e.pageX - $this.offset().left + state.center.x - $this.width()/2,
-            y: e.pageY - $this.offset().top + state.center.y - $this.height()/2
+            x: px - $this.offset().left + state.center.x - $this.width()/2,
+            y: py - $this.offset().top + state.center.y - $this.height()/2
           };
           e.mapPosition.getLat = function() {
             return $.jump.y2lat(e.mapPosition.y, state.zoom, state.tilesize);
@@ -343,7 +345,6 @@
         }
         var touches = e.originalEvent.touches;
         if (touches.length == 1) {
-          currentlydragging = $this;
           state.dragging = {};
           state.dragging.start = {
             x: touches[0].clientX,
@@ -355,17 +356,18 @@
           $(document).bind("touchend", touchend);
           
           // set up double tap detection:
-          // thx to touchable.js by dotmaster
-          if (!inDblTap) {
-            inDblTap = true;
-            dblTapTimer = setTimeout(function() {
-              inDblTap = false;
+          if (!state.dbltap) {
+            state.dbltap = setTimeout(function() {
+              state.dbltap = false;
             }, 500);
           } else {
-            $this.trigger('dblClick', e);
-            $this.trigger('dblTap', e);
-            clearTimeout(dblTapTimer);
-            inDblTap = false;
+            clearTimeout(state.dbltap);
+            state.dbltap = false;
+            //var dblTapEvent = jQuery.Event("dbltap");
+            //dblTapEvent.mapPosition = $.extend({},e.mapPosition,true);
+            var dblTapEvent = $.extend({}, e, true);
+            dblTapEvent.type = "dbltap";
+            $this.trigger(dblTapEvent);
            }
         } else {
           // it's a 2 finger gesture
@@ -382,13 +384,31 @@
           x: state.dragging.original_x - state.dragging.dragOffset.x,
           y: state.dragging.original_y - state.dragging.dragOffset.y
         }
-        currentlydragging.trigger("changecenter", newcenter);
+        $this.trigger("changecenter", newcenter);
       };
       function touchend(e){
         var touches = e.originalEvent.touches;
         $(document).unbind("touchmove", touchmove);
         $(document).unbind("touchend", touchend);
       };
+      function gesturestart(e) {
+        var centerpos = {};
+        state.twoFingerTap = setTimeout(function() {
+          state.twoFingerTap = false;
+        }, 500);
+      }
+      $this.bind("gesturestart", gesturestart);
+      function gestureend(e) {
+        var centerpos = {};
+        if (state.twoFingerTap) {
+          clearTimeout(state.twoFingerTap);
+          state.twoFingerTap = false;
+          var twoFingerTapEvent = $.extend({}, e, true);
+          twoFingerTapEvent.type = "twofingertap";
+          $this.trigger(twoFingerTapEvent);
+        }
+      }
+      $this.bind("gestureend", gestureend);
       function gesturechange(e) {
         var centerpos = {};
         //$this.triggerHandler('zoom', state.zoom - 1 + e.originalEvent.scale);
@@ -400,6 +420,18 @@
         }
       }
       $this.bind("gesturechange", gesturechange);
+      function dbltap(e){
+        state.center.x = e.mapPosition.x;
+        state.center.y = e.mapPosition.y;
+        $this.triggerHandler("zoomin");
+      }
+      $this.bind("dbltap", dbltap);
+      function twofingertap(e){
+        //state.center.x = e.mapPosition.x;
+        //state.center.y = e.mapPosition.y;
+        $this.triggerHandler("zoomout");
+      }
+      $this.bind("twofingertap", twofingertap);
     }
   }
   // These functions work on the document, because
