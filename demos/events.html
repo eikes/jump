@@ -52,7 +52,6 @@ Zoom: <input type="text" id="zoom">
     $('#lon').val(loc.getNewLon);
   });
   map.bind("zoom", function(e, z) {
-      console.log(z);
     $('#zoom').val(z);
   });
   // Change the center externally:
