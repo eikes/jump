@@ -21,44 +21,40 @@
         .css("font-weight", "bold")
         .css("font-size", "18px")
         .css("text-decoration", "none");
-      function trig(event, args) {
-        $this.trigger(event, args);
-        return false;
-      }
       var north = a.clone()
         .addClass("gonorth")
         .html("&uarr;")
         .borderradius("15px 15px 0 0")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {y: -10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: -10});e.preventDefault();e.stopPropagation();});
       var west = a.clone()
         .addClass("gowest")
         .html("&larr;")
         .borderradius("15px 0 0 15px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {x: -10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: -10});e.preventDefault();e.stopPropagation();});
       var east = a.clone()
         .addClass("goeast")
         .html("&rarr;")
         .borderradius("0 15px 15px 0")
-        .bind("touchstart click", function(e) {$this.trigger("move", {x: 10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: 10});e.preventDefault();e.stopPropagation();});
       var south = a.clone()
         .addClass("gosouth")
         .html("&darr;")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {y: 10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: 10});e.preventDefault();e.stopPropagation();});
       var zoomin = a.clone()
         .addClass("zoomin")
         .html("+")
         .borderradius("15px 15px 0 0")
         .css("margin", "10px 0 0 12px")
-        .bind("touchstart click", function(e) {$this.trigger("zoomin");return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("zoomin");e.preventDefault();e.stopPropagation();});
       var zoomout = a.clone()
         .addClass("zoomout")
         .html("-")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("zoomout");return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("zoomout");e.preventDefault();e.stopPropagation();});
       div
         .append(north)
         .append(west)

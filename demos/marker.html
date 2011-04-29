@@ -28,17 +28,6 @@
 </head>
 <body>
 
-<div id="map0" class="map"></div>
-<script>
-  $("#map0").jump({
-    center: {
-      lon: 10,
-      lat: 50.9
-    },
-    zoom:6
-  });
-</script>
-
 <div id="map1" class="map"></div>
 <script>
   $("#map1").jump({
@@ -47,7 +36,9 @@
       lat: 52.48935
     },
     zoom:14,
-    coordinates: true
+    plugins: {
+        marker: {}
+    }
   })
   .trigger('addMarker', {
       content: "U-Bhf Südstern",

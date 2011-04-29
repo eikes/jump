@@ -43,7 +43,7 @@
   // todo: Add Objects for GeoPoint, BoundingBox, GeoHtmlElement
   
   $.fn.jump = function(options) {
-    options = $.extend({}, $.fn.jump.defaults, options);
+    options = $.extend(true, {}, $.fn.jump.defaults, options);
     return this.each(function(){
       var $this = $(this);
       $this
@@ -51,7 +51,7 @@
         .css("overflow", "hidden");
       var state = $.extend(true, {}, options);
       $this.data("state", state);
-
+      
       function changecenter(e, location) {
         location.old_center = $.extend({},state.center);
         if (location.lat && location.lon) {
@@ -76,7 +76,7 @@
         };
       }
       $this.bind('changecenter', changecenter);
-
+      
       function move(e, distance) {
         var newcenter = {
           x: state.center.x + (distance.x ? distance.x : 0),
@@ -85,7 +85,7 @@
         $this.triggerHandler('changecenter', newcenter);
       }
       $this.bind('move', move);
-
+      
       function zoom(e, level) {
         if (level < 0) level = 0;
         if (level > 18) level = 18;
@@ -100,87 +100,16 @@
         return result;
       }
       $this.bind('zoom', zoom);
-
+      
       function zoomin(e) {
         return $this.triggerHandler('zoom', state.zoom + 1);
       }
       $this.bind('zoomin', zoomin);
-
+      
       function zoomout(e) {
         return $this.triggerHandler('zoom', state.zoom - 1);
       }
       $this.bind('zoomout', zoomout);
-      
-      function getOffset(lon, lat) {
-        var result = {
-          x: $.jump.lon2x(lon, state.zoom, state.tilesize) -
-              (state.center.x - Math.floor($this.width()/2)),
-          y: $.jump.lat2y(lat, state.zoom, state.tilesize) -
-              (state.center.y - Math.floor($this.height()/2))
-        };
-        return result;
-      }
-      
-      function addElement(event, args) {
-        var el = args.element;
-        var loc = args.location;
-        var off = args.offset ? args.offset : {x: 0, y: 0};
-        var position = getOffset(loc.lon, loc.lat);
-        el.css("position", "absolute");
-        el.css("left", position.x + off.x);
-        el.css("top", position.y + off.y);
-        $this.append(el);
-        $this.bind("zoom changecenter", function(event, level) {
-          position = getOffset(loc.lon, loc.lat);
-          el.css("left", position.x + off.x);
-          el.css("top", position.y + off.y);
-        });
-      }
-      $this.bind('addElement', addElement);
-      
-      function addMarker(event, options) {
-        options = $.extend({
-          color: "red",
-          content: false,
-          offset: {x:-9, y: -9}
-        }, options);
-        var popup = $('<div>')
-          .css("border", "1px solid grey")
-          .css("background-color", "white")
-          .css("z-index", 11)
-          .addClass("popupContent")
-          .html(options.content)
-          .mouseover(function() {
-              $(this).show();
-            })
-          .mouseout(function() {
-              $(this).hide();
-            })
-          .hide();
-          
-        var el = $('<div>')
-          .css("border", "4px solid "+options.color)
-          .css("height", "10")
-          .css("width", "10")
-          .css("z-index", 10)
-          .borderradius("10px")
-          .mouseover(function() {
-              popup.show();
-            })
-          .mouseout(function() {
-              popup.hide();
-            });
-        $this.trigger('addElement', {
-          element: popup,
-          location: options.location
-        });
-        $this.trigger('addElement', {
-          element: el,
-          offset: options.offset,
-          location: options.location
-        });
-      }
-      $this.bind('addMarker', addMarker);
       
       function getBoundingBox() {
         var bbox = {
@@ -195,7 +124,7 @@
         };
       }
       $this.bind('getBoundingBox', getBoundingBox);
-
+      
       // Let others know where the mouse/finger is:
       $this.bind('click dblclick mousedown mouseover mouseup touchstart touchmove touchend',
         function(e) {
@@ -217,33 +146,51 @@
       // Load and enable pugins, this needs to be done in the end to ensure
       // that the previous bindings are executed beforehand
       var pluginname;
-      for (pluginname in $.jump.plugins) {
-        plugin = $.jump.plugins[pluginname];
-        var pluginoptions = state[pluginname];
-        if (state[pluginname]) {
-          plugin.start.call(this, pluginoptions);
-        }
+      for (pluginname in state.plugins) {
+        (function(pn) {
+          var plugin = $.jump.plugins[pn];
+          var pluginoptions = state[pn];
+          var el = this;
+          // allow dynamic loading of plugins:
+          if (plugin == undefined) {
+            //determine current path
+            var url = $('script[src$="jump.js"]').attr('src');
+            var path = url.substr(0,url.lastIndexOf("jump.js"));
+            //and load plugins:
+            $.getScript(path + pn + ".js", function(){
+              plugin = $.jump.plugins[pn];
+              pluginoptions = state.plugins[pn];
+              plugin.start.call(el, pluginoptions);
+              // this is a bad workaround, but for now it's ok
+              // usually people use the complete build anyway
+              $(el).triggerHandler('changecenter', state.center);
+            });
+          } else {
+            plugin.start.call(this, pluginoptions);
+          }
+        }).call(this, pluginname);
       }
       
       // Let everyone do their thing:
       $this.triggerHandler('changecenter', state.center);
     });
   };
+  // These are the default settings
   $.fn.jump.defaults = {
     zoom: 14,
     center: {
       lat: 52.52643,
       lon: 13.41156
     },
-    clickcontroller: true,
-    mousecontroller: true,
-    touchcontroller: true,
-    osmtiles: {tilesize: 256},
-    attribution: true
+    plugins: {
+      clickcontroller: true,
+      mousecontroller: true,
+      touchcontroller: true,
+      osmtiles: {tilesize: 256},
+      attribution: true
+    }
   };
 })(jQuery);
-
-
 // OpenStreetMap tiles plugin
 (function($){
   $.jump.plugins.osmtiles = {
@@ -330,7 +277,6 @@
     }
   }
 })(jQuery);
-
 // touch controller:
 (function($){
   $.jump.plugins.touchcontroller = {
@@ -531,44 +477,40 @@
         .css("font-weight", "bold")
         .css("font-size", "18px")
         .css("text-decoration", "none");
-      function trig(event, args) {
-        $this.trigger(event, args);
-        return false;
-      }
       var north = a.clone()
         .addClass("gonorth")
         .html("&uarr;")
         .borderradius("15px 15px 0 0")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {y: -10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: -10});e.preventDefault();e.stopPropagation();});
       var west = a.clone()
         .addClass("gowest")
         .html("&larr;")
         .borderradius("15px 0 0 15px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {x: -10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: -10});e.preventDefault();e.stopPropagation();});
       var east = a.clone()
         .addClass("goeast")
         .html("&rarr;")
         .borderradius("0 15px 15px 0")
-        .bind("touchstart click", function(e) {$this.trigger("move", {x: 10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: 10});e.preventDefault();e.stopPropagation();});
       var south = a.clone()
         .addClass("gosouth")
         .html("&darr;")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("move", {y: 10});return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: 10});e.preventDefault();e.stopPropagation();});
       var zoomin = a.clone()
         .addClass("zoomin")
         .html("+")
         .borderradius("15px 15px 0 0")
         .css("margin", "10px 0 0 12px")
-        .bind("touchstart click", function(e) {$this.trigger("zoomin");return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("zoomin");e.preventDefault();e.stopPropagation();});
       var zoomout = a.clone()
         .addClass("zoomout")
         .html("-")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("touchstart click", function(e) {$this.trigger("zoomout");return false});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("zoomout");e.preventDefault();e.stopPropagation();});
       div
         .append(north)
         .append(west)
@@ -592,7 +534,6 @@
     });
   };
 })(jQuery);
-
 // attribution plugin
 (function($){
   $.jump.plugins['attribution'] = {
@@ -603,7 +544,6 @@
     }
   }
 })(jQuery);
-
 // coordinates plugin
 (function($){
   $.jump.plugins['coordinates'] = {
@@ -613,10 +553,80 @@
       var coords = $('<div style="position:absolute;bottom:20px;right:20px;font-weight:bold;z-index:10;">');
       $this.append(coords);
       $this.bind("changecenter", function(e, loc) {
-      coords.html(
-        Math.round(loc.getNewLon()*100000)/100000 + "<br>" +
-        Math.round(loc.getNewLat()*100000)/100000);
+        coords.html(
+          Math.round(loc.getNewLon()*100000)/100000 + "<br>" +
+          Math.round(loc.getNewLat()*100000)/100000);
       });
+    }
+  }
+})(jQuery);
+// marker plugin
+(function($){
+  $.jump.plugins.marker = {
+    start: function(options){
+      var $this = $(this);
+      var state = $this.data("state");
+      function getOffset(lon, lat) {
+        var result = {
+          x: $.jump.lon2x(lon, state.zoom, state.tilesize) -
+              (state.center.x - Math.floor($this.width()/2)),
+          y: $.jump.lat2y(lat, state.zoom, state.tilesize) -
+              (state.center.y - Math.floor($this.height()/2))
+        };
+        return result;
+      }
+      
+      function addElement(event, args) {
+        var el = args.element;
+        var loc = args.location;
+        var off = args.offset ? args.offset : {x: 0, y: 0};
+        var position = getOffset(loc.lon, loc.lat);
+        el.css("position", "absolute");
+        el.css("left", position.x + off.x);
+        el.css("top", position.y + off.y);
+        $this.append(el);
+        $this.bind("zoom changecenter", function(event, level) {
+          position = getOffset(loc.lon, loc.lat);
+          el.css("left", position.x + off.x);
+          el.css("top", position.y + off.y);
+        });
+      }
+      $this.bind('addElement', addElement);
+      
+      function addMarker(event, options) {
+        options = $.extend({
+          color: "red",
+          content: false,
+          offset: {x:-9, y: -9}
+        }, options);
+        var popup = $('<div>')
+          .css("border", "1px solid grey")
+          .css("background-color", "white")
+          .css("z-index", 11)
+          .addClass("popupContent")
+          .html(options.content)
+          .hide();
+          
+        var el = $('<div>')
+          .css("border", "4px solid "+options.color)
+          .css("height", "10")
+          .css("width", "10")
+          .css("z-index", 10)
+          .borderradius("10px")
+          .bind("click touchstart", function() {
+              popup.toggle();
+            })
+        $this.trigger('addElement', {
+          element: popup,
+          location: options.location
+        });
+        $this.trigger('addElement', {
+          element: el,
+          offset: options.offset,
+          location: options.location
+        });
+      }
+      $this.bind('addMarker', addMarker);
     }
   }
 })(jQuery);

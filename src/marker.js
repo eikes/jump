@@ -1,8 +1,9 @@
-// coordinates plugin
+// marker plugin
 (function($){
-  $.jump.plugins['coordinates'] = {
+  $.jump.plugins.marker = {
     start: function(options){
-      $this = $(this);
+      var $this = $(this);
+      var state = $this.data("state");
       function getOffset(lon, lat) {
         var result = {
           x: $.jump.lon2x(lon, state.zoom, state.tilesize) -
@@ -42,12 +43,6 @@
           .css("z-index", 11)
           .addClass("popupContent")
           .html(options.content)
-          .mouseover(function() {
-              $(this).show();
-            })
-          .mouseout(function() {
-              $(this).hide();
-            })
           .hide();
           
         var el = $('<div>')
@@ -56,12 +51,9 @@
           .css("width", "10")
           .css("z-index", 10)
           .borderradius("10px")
-          .mouseover(function() {
-              popup.show();
+          .bind("click touchstart", function() {
+              popup.toggle();
             })
-          .mouseout(function() {
-              popup.hide();
-            });
         $this.trigger('addElement', {
           element: popup,
           location: options.location
