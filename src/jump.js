@@ -43,7 +43,7 @@
   // todo: Add Objects for GeoPoint, BoundingBox, GeoHtmlElement
   
   $.fn.jump = function(options) {
-    options = $.extend({}, $.fn.jump.defaults, options);
+    options = $.extend(true, {}, $.fn.jump.defaults, options);
     return this.each(function(){
       var $this = $(this);
       $this
@@ -149,15 +149,17 @@
       for (pluginname in state.plugins) {
         (function(pn) {
           var plugin = $.jump.plugins[pn];
-
           var pluginoptions = state[pn];
           var el = this;
-          // allow dynamic loading of extension:
+          // allow dynamic loading of plugins:
           if (plugin == undefined) {
-            $.getScript("src/"+pn+".js", function(){
+            //determine current path
+            var url = $('script[src$="jump.js"]').attr('src');
+            var path = url.substr(0,url.lastIndexOf("jump.js"));
+            //and load plugins:
+            $.getScript(path + pn + ".js", function(){
               plugin = $.jump.plugins[pn];
               pluginoptions = state.plugins[pn];
-              //console.log(el, pluginoptions, plugin);
               plugin.start.call(el, pluginoptions);
               // this is a bad workaround, but for now it's ok
               // usually people use the complete build anyway
