@@ -77,14 +77,14 @@
       }
       $this.bind('changecenter', changecenter);
       
-      function move(e, distance) {
+      function moveby(e, distance) {
         var newcenter = {
           x: state.center.x + (distance.x ? distance.x : 0),
           y: state.center.y + (distance.y ? distance.y : 0)
         };
         $this.triggerHandler('changecenter', newcenter);
       }
-      $this.bind('move', move);
+      $this.bind('moveby', moveby);
       
       function zoom(e, level) {
         if (level < 0) level = 0;
