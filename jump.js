@@ -391,15 +391,16 @@
       var state = $this.data("state");
       
       // Mousewheel handling:
-      function mousescroll(e) {
-        e.preventDefault();
+      function mousescroll(event) {
+        event = $.event.fix(event || window.event);
+        event.type = "mousewheel";
+        event.preventDefault();
         var delta = 0;
-        e.type = "mousewheel";
         if ( event.wheelDelta ) delta = event.wheelDelta/120;
         if ( event.detail     ) delta = -event.detail/3;
         var mousepos = {
-          x: e.pageX - $this.offset().top,
-          y: e.pageY - $this.offset().left,
+          x: event.pageX - $this.offset().top,
+          y: event.pageY - $this.offset().left
         }
         if (delta > 0) {
           $this.triggerHandler('zoomin', mousepos);
