@@ -77,14 +77,14 @@
       }
       $this.bind('changecenter', changecenter);
       
-      function move(e, distance) {
+      function moveby(e, distance) {
         var newcenter = {
           x: state.center.x + (distance.x ? distance.x : 0),
           y: state.center.y + (distance.y ? distance.y : 0)
         };
         $this.triggerHandler('changecenter', newcenter);
       }
-      $this.bind('move', move);
+      $this.bind('moveby', moveby);
       
       function zoom(e, level) {
         if (level < 0) level = 0;
@@ -466,7 +466,8 @@
         .css("z-index", "10")
         .css("top", "20px")
         .css("left", "20px");
-      var a = $('<a class="clicknavigationbox" href="#">')
+      // Todo: separate div for style from A for function and tab access
+      var a = $('<div class="clicknavigationbox" href="#">')
         .css("width", "25px")
         .css("height", "25px")
         .css("margin", "0")
@@ -482,23 +483,23 @@
         .html("&uarr;")
         .borderradius("15px 15px 0 0")
         .css("margin-left", "12px")
-        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: -10});e.preventDefault();e.stopPropagation();});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("moveby", {y: -10});e.preventDefault();e.stopPropagation();});
       var west = a.clone()
         .addClass("gowest")
         .html("&larr;")
         .borderradius("15px 0 0 15px")
-        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: -10});e.preventDefault();e.stopPropagation();});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("moveby", {x: -10});e.preventDefault();e.stopPropagation();});
       var east = a.clone()
         .addClass("goeast")
         .html("&rarr;")
         .borderradius("0 15px 15px 0")
-        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {x: 10});e.preventDefault();e.stopPropagation();});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("moveby", {x: 10});e.preventDefault();e.stopPropagation();});
       var south = a.clone()
         .addClass("gosouth")
         .html("&darr;")
         .borderradius("0 0 15px 15px")
         .css("margin-left", "12px")
-        .bind("touchstart click dblclick", function(e) {$this.trigger("move", {y: 10});e.preventDefault();e.stopPropagation();});
+        .bind("touchstart click dblclick", function(e) {$this.trigger("moveby", {y: 10});e.preventDefault();e.stopPropagation();});
       var zoomin = a.clone()
         .addClass("zoomin")
         .html("+")
