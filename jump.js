@@ -151,23 +151,7 @@
           var plugin = $.jump.plugins[pn];
           var pluginoptions = state[pn];
           var el = this;
-          // allow dynamic loading of plugins:
-          if (plugin == undefined) {
-            //determine current path
-            var url = $('script[src$="jump.js"]').attr('src');
-            var path = url.substr(0,url.lastIndexOf("jump.js"));
-            //and load plugins:
-            $.getScript(path + pn + ".js", function(){
-              plugin = $.jump.plugins[pn];
-              pluginoptions = state.plugins[pn];
-              plugin.start.call(el, pluginoptions);
-              // this is a bad workaround, but for now it's ok
-              // usually people use the complete build anyway
-              $(el).triggerHandler('changecenter', state.center);
-            });
-          } else {
-            plugin.start.call(this, pluginoptions);
-          }
+          plugin.start.call(this, pluginoptions);
         }).call(this, pluginname);
       }
       

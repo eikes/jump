@@ -9,3 +9,6 @@ FILES = src/jump.js\
 
 jump:
 	@@cat ${FILES} > jump.js
+
+min: 
+	@@curl --data-urlencode js_code@jump.js --data output_info=compiled_code http://closure-compiler.appspot.com/compile > jump.min.js
