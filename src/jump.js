@@ -144,6 +144,7 @@
         });
         
       // Load and enable pugins, this needs to be done in the end to ensure
+      // that the previous bindings are executed beforehand
       var pluginname;
       for (pluginname in state.plugins) {
         var plugin = $.jump.plugins[pluginname];
