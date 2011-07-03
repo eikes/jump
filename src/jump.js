@@ -144,17 +144,12 @@
         });
         
       // Load and enable pugins, this needs to be done in the end to ensure
-      // that the previous bindings are executed beforehand
       var pluginname;
       for (pluginname in state.plugins) {
-        (function(pn) {
-          var plugin = $.jump.plugins[pn];
-          var pluginoptions = state[pn];
-          var el = this;
-          plugin.start.call(this, pluginoptions);
-        }).call(this, pluginname);
+        var plugin = $.jump.plugins[pluginname];
+        var pluginoptions = state.plugins[pluginname];
+        plugin.start.call(this, pluginoptions);
       }
-      
       // Let everyone do their thing:
       $this.triggerHandler('changecenter', state.center);
     });

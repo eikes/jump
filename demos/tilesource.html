@@ -31,23 +31,18 @@
 <div id="map1" class="map"></div>
 <script>
   $("#map1").jump({
-    center: {
-      lon: 13.4077,
-      lat: 52.48935
-    },
-    zoom:14,
     plugins: {
-        marker: {}
+      osmtiles: {
+        tileurl: function(zoom,x,y) {
+          // a is either "a", "b" or "c"
+          var a = String.fromCharCode(97+Math.abs(zoom+x+y)%3); 
+          var apikey = "BC9A493B41014CAABB98F0471D759707";
+          return "http://"+a+".tile.cloudmade.com/"+apikey
+                 +"/1/256/"+zoom+"/"+x+"/"+y+".png" 
+        }
+      }
     }
-  })
-  .trigger('addMarker', {
-      content: "U-Bhf Südstern",
-      location: {lon: 13.4077276, lat: 52.4893322}
-  })
-  .trigger('addMarker', {
-      content: "U-Bhf Herrmannplatz",
-      location: {lon: 13.4243789, lat: 52.4864284}
-  })
+  });
 </script>
 
 <script>
